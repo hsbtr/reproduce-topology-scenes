@@ -72,7 +72,7 @@ function App() {
                         y: 100,
                     }
                 ],
-                websocket: "ws://192.168.1.9:8080",
+                // websocket: "ws://192.168.1.9:8080", 
                 scale: 1,
                 version: "1.1.32",
                 x: 0,
