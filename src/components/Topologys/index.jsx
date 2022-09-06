@@ -1,7 +1,8 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useImperativeHandle, forwardRef } from "react";
 import { Topology } from "@topology/core";
+import { baseBusBar } from "./customizePen";
 import "./index.css";
-export default function Topologys(props) {
+function Topologys(props, ref) {
     const topologyRef = useRef(null);
     const { rootId = "topology", engineOptions = {}, dataSource, websocketUrl } = props;
     const registerTopology = () => {
@@ -16,23 +17,25 @@ export default function Topologys(props) {
             ...engineOptions,
         };
         topologyRef.current = new Topology(rootId, options);
-        if (websocketUrl) {
-            topologyRef.current?.connectWebsocket(websocketUrl);
-        }
-        topologyRef.current.socketFn = (mess, topic) => {
-            console.log(mess);
-        };
+        topologyRef.current.register({ baseBusBar });
         topologyRef.current.fitView();
     };
     useEffect(() => {
         registerTopology();
+        return () => {
+            topologyRef.current?.destroy();
+        };
     }, []);
     useEffect(() => {
         topologyRef.current?.open(dataSource);
     }, [dataSource]);
+    useImperativeHandle(ref, () => {
+        return topologyRef.current;
+    });
     return (
         <div className={"topology-wrapper"}>
             <div id={rootId} className={"topology"}></div>
         </div>
     );
 }
+export default forwardRef(Topologys);
